@@ -1,0 +1,9 @@
+metadata:
+  annotations:
+    api.service.kubernetes.io/path: /dbTest
+spec:
+  ports:
+    - name: jetty-port
+      port: 9955
+      targetPort: 9955
+      

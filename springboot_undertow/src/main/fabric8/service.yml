@@ -1,0 +1,9 @@
+metadata:
+  annotations:
+    api.service.kubernetes.io/path: /undertowTest
+spec:
+  ports:
+    - name: undertow-port
+      port: 9956
+      targetPort: 9956
+      

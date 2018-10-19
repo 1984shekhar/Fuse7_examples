@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:camel="http://camel.apache.org/schema/spring"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+    <!-- Define a traditional camel context here -->
+    <camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
+        <route id="simple-route1">
+            <from id="route-timer" uri="timer:foo?period=30000"/>
+            <transform id="route-transform">
+                <method ref="myTransformer"/>
+            </transform>
+            <log id="route-log" message=">>> ${body}"/>
+        </route>
+        
+          <route id="test.route">
+            <from uri="undertow:http://0.0.0.0:9956/undertowTest" />
+            <convertBodyTo type="java.lang.String"/>
+            <log message="\n REQUEST RECEIVED :\n Headers: ${headers}\n Body: ${body} \n" loggingLevel="INFO"/>
+            <log message="\n MESSAGE RESPONSE  :\n Headers: ${headers}\n Body: ${body} \n" loggingLevel="INFO"/>
+            <setBody><constant>hello all</constant></setBody>
+        </route>
+    </camelContext>
+</beans>
