@@ -90,6 +90,7 @@ public class MySimpleCacheManager {
 		if (cacheManager == null) {
 			cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
 								.with(CacheManagerBuilder.persistence(CACHE_PATH))
+				                                .withClassLoader(this.getClass().getClassLoader())
 								.build(true);
 		}
 		
