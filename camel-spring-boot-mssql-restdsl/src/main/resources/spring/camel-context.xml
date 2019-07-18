@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://camel.apache.org/schema/spring       http://camel.apache.org/schema/spring/camel-spring.xsd">
+    <bean
+        class="org.springframework.boot.web.servlet.ServletRegistrationBean" id="servlet">
+        <property name="name" value="CamelServlet"/>
+        <property name="servlet" ref="camelServlet"/>
+        <property name="urlMappings" value="/claims/*"/>
+    </bean>
+      <bean class="org.apache.camel.component.servlet.CamelHttpTransportServlet"
+                id="camelServlet" />
+    
+    <bean
+        class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+        id="dataSource" name="dataSource" primary="true">
+        <property name="driverClassName" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
+        <property name="url" value="jdbc:sqlserver://IP:PORT;DatabaseName=DBConnect;"/>
+        <property name="username" value="dbuser"/>
+        <property name="password" value="dbpassword"/>
+    </bean>
+    <camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
+        <restConfiguration apiContextPath="api-docs" bindingMode="json"
+            component="servlet" contextPath="/claimlab">
+            <apiProperty key="cors" value="true"/>
+            <apiProperty key="api.title" value="Claim Info API Lab"/>
+            <apiProperty key="api.version" value="1.0.0"/>
+        </restConfiguration>
+        <rest id="rest-123" path="/claim">
+            <get id="get-456" uri="all">
+                <description>Get claim details</description>
+                <to uri="direct:getclaims"/>
+            </get>
+        </rest>
+        <route id="claim">
+            <from id="direct1" uri="direct:getClaims"/>
+            <to id="_to1" uri="sql:SELECT TOP 1 FIRST_KY, SECOND_KY FROM DBConnect.db.CASE1   ORDER BY FIRST_KY?dataSource=#dataSource"/>
+            <log id="_log1" message="${body}"/>
+        </route>
+    </camelContext>
+</beans>
