@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:camel="http://camel.apache.org/schema/spring"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:cxf="http://camel.apache.org/schema/cxf"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd        http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd">
+    <bean class="org.eclipse.jetty.util.security.Constraint" id="constraint">
+        <property name="name" value="BASIC"/>
+        <property name="roles" value="rolename"/>
+        <property name="authenticate" value="true"/>
+    </bean>
+    <bean class="org.eclipse.jetty.security.ConstraintMapping" id="constraintMapping">
+        <property name="constraint" ref="constraint"/>
+        <property name="pathSpec" value="/cxf/*"/>
+    </bean>
+    <bean class="org.eclipse.jetty.security.ConstraintSecurityHandler" id="securityHandler">
+        <property name="loginService">
+            <bean class="com.mycompany.service.HardcodedLoginService"/>
+        </property>
+        <property name="authenticator">
+            <bean class="com.mycompany.service.ExtendBasicAuthenticator"/>
+        </property>
+        <property name="constraintMappings">
+            <list>
+                <ref bean="constraintMapping"/>
+            </list>
+        </property>
+    </bean>
+    <camelContext id="camel_PrepaidDetails" xmlns="http://camel.apache.org/schema/spring">
+        <restConfiguration component="jetty" port="9091">
+            <endpointProperty key="handlers" value="securityHandler"/>
+        </restConfiguration>
+        <rest path="/">
+            <get uri="/cxf">
+                <to uri="direct:hello"/>
+            </get>
+        </rest>
+        <route id="GetPrepaidDetailsRoute1">
+            <from id="_from2" uri="direct:hello"/>
+            <log id="_log1" message="Success"/>
+            <log id="_log2" message="${messageHistory}"/>
+        </route>
+    </camelContext>
+</beans>
