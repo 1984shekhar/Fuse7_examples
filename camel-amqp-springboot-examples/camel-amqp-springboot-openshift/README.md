@@ -1,3 +1,27 @@
+#Steps to install AMQ 7.4 on Openshift
+oc new-project amq-demo
+echo '{"kind": "ServiceAccount", "apiVersion": "v1", "metadata": {"name": "amq-service-account"}}' | oc create -f -
+oc policy add-role-to-user view system:serviceaccount:amq-demo:amq-service-account
+keytool -genkey -alias broker -keyalg RSA -keystore broker.ks
+keytool -export -alias broker -keystore broker.ks -file broker_cert
+keytool -genkey -alias client -keyalg RSA -keystore client.ks
+keytool -import -alias broker -keystore client.ts -file broker_cert
+oc create secret generic amq-app-secret --from-file=broker.ks
+oc secrets add sa/amq-service-account secret/amq-app-secret
+
+#Basic non ssl non persistence template
+oc new-app --template=amq-broker-74-basic \
+   -p AMQ_PROTOCOL=openwire,amqp,stomp,mqtt,hornetq \
+   -p AMQ_QUEUES=demoQueue \
+   -p AMQ_ADDRESSES=demoTopic \
+   -p AMQ_USER=admin \
+   -p AMQ_PASSWORD=admin \
+
+
+
+
+
+
 # Spring Boot, Camel and ActiveMQ QuickStart
 
 This quickstart shows how to connect a Spring-Boot application to an A-MQ xPaaS message broker and use JMS messaging between two Camel routes using OpenShift.
@@ -30,25 +54,42 @@ Then find the name of the pod that runs this quickstart, and output the logs fro
 You can also use the openshift [web console](https://docs.openshift.com/enterprise/3.1/getting_started/developers/developers_console.html#tutorial-video) to manage the
 running pods, and view logs and much more.
 
-### Running via an S2I Application Template
 
-Application templates allow you deploy applications to OpenShift by filling out a form in the OpenShift console that allows you to adjust deployment parameters.  This template uses an S2I source build so that it handle building and deploying the application for you.
+# Create configmap
+[cpandey@cpandey camel-amqp-springboot-openshift]$ oc get service -n amq-demo
+NAME                 TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)     AGE
+broker-amq-amqp      ClusterIP   172.30.139.253   <none>        5672/TCP    2h
+broker-amq-jolokia   ClusterIP   172.30.53.5      <none>        8161/TCP    2h
+broker-amq-mqtt      ClusterIP   172.30.114.143   <none>        1883/TCP    2h
+broker-amq-stomp     ClusterIP   172.30.165.76    <none>        61613/TCP   2h
+broker-amq-tcp       ClusterIP   172.30.188.16    <none>        61616/TCP   2h
+[cpandey@cpandey camel-amqp-springboot-openshift]$ 
 
-First, import the Fuse image streams:
+[cpandey@cpandey camel-amqp-springboot-openshift]$ cat application.properties 
+service.host=172.30.139.253
+amqp.servicePort=5672
 
-    oc create -f https://raw.githubusercontent.com/jboss-fuse/application-templates/GA/fis-image-streams.json
+oc create configmap spring-boot-camel-amq-config --from-env-file=./application.properties
 
-Then create the quickstart template:
 
-    oc create -f https://raw.githubusercontent.com/jboss-fuse/application-templates/GA/quickstarts/spring-boot-camel-amq-template.json
 
-Now when you use "Add to Project" button in the OpenShift console, you should see a template for this quickstart. 
+# Check Statistics
+oc project amq-demo
+[cpandey@cpandey spring-boot-camel-config-archetype]$ oc get pods
+NAME                 READY     STATUS    RESTARTS   AGE
+broker-amq-1-pjwv6   1/1       Running   0          2h
+[cpandey@cpandey spring-boot-camel-config-archetype]$ 
+[cpandey@cpandey spring-boot-camel-config-archetype]$ oc rsh broker-amq-1-pjwv6
+sh-4.2$ pwd
+/home/jboss
+sh-4.2$ cd broker/bin
+sh-4.2$ ./artemis queue stat
+OpenJDK 64-Bit Server VM warning: If the number of processors is expected to increase from one, then you should configure the number of parallel GC threads appropriately using -XX:ParallelGCThreads=N
+|NAME                     |ADDRESS                  |CONSUMER_COUNT |MESSAGE_COUNT |MESSAGES_ADDED |DELIVERING_COUNT |MESSAGES_ACKED |
+|DLQ                      |DLQ                      |0              |0             |0              |0                |0              |
+|ExpiryQueue              |ExpiryQueue              |0              |0             |0              |0                |0              |
+|activemq.management.6e278d1d-3f1f-4f8f-86d1-ffb8b72214c8|activemq.management.6e278d1d-3f1f-4f8f-86d1-ffb8b72214c8|1              |0             |0              |0                |0              |
+|demoQueue                |demoQueue                |0              |0             |0              |0                |0              |
+|incomingOrders           |incomingOrders           |1              |0             |168            |0                |168            |
+sh-4.2$ 
 
-### Integration Testing
-
-The example includes a [Arquillian Cube Openshift](https://github.com/arquillian/arquillian-cube/tree/master/openshift) OpenShift Integration Test. 
-Once the container image has been built and deployed in OpenShift, the integration test can be run with:
-
-    mvn test -Dtest=*KT
-
-The test is disabled by default and has to be enabled using `-Dtest`. Open Source Community documentation at [Arquillian Cube](http://arquillian.org/arquillian-cube/) provide more information on writing full fledged black box integration tests for OpenShift. 

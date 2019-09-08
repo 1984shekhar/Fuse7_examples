@@ -159,9 +159,10 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.jboss.redhat-fuse</groupId>
+                        <groupId>io.fabric8</groupId>
                         <artifactId>fabric8-maven-plugin</artifactId>
-                        <version>${fuse.bom.version}</version>
+                        <!-- <version>${fuse.bom.version}</version> -->
+                        <version>3.5.42</version>
                         <executions>
                             <execution>
                                 <goals>
