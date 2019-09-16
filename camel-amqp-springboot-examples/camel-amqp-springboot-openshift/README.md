@@ -1,12 +1,20 @@
 #Steps to install AMQ 7.4 on Openshift
 oc new-project amq-demo
+
 echo '{"kind": "ServiceAccount", "apiVersion": "v1", "metadata": {"name": "amq-service-account"}}' | oc create -f -
+
 oc policy add-role-to-user view system:serviceaccount:amq-demo:amq-service-account
+
 keytool -genkey -alias broker -keyalg RSA -keystore broker.ks
+
 keytool -export -alias broker -keystore broker.ks -file broker_cert
+
 keytool -genkey -alias client -keyalg RSA -keystore client.ks
+
 keytool -import -alias broker -keystore client.ts -file broker_cert
+
 oc create secret generic amq-app-secret --from-file=broker.ks
+
 oc secrets add sa/amq-service-account secret/amq-app-secret
 
 #Basic non ssl non persistence template
