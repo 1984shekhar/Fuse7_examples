@@ -84,20 +84,37 @@ oc create configmap spring-boot-camel-amq-config --from-env-file=./application.p
 # Check Statistics
 oc project amq-demo
 [cpandey@cpandey spring-boot-camel-config-archetype]$ oc get pods
+
 NAME                 READY     STATUS    RESTARTS   AGE
+
 broker-amq-1-pjwv6   1/1       Running   0          2h
+
 [cpandey@cpandey spring-boot-camel-config-archetype]$ 
+
 [cpandey@cpandey spring-boot-camel-config-archetype]$ oc rsh broker-amq-1-pjwv6
+
 sh-4.2$ pwd
+
 /home/jboss
+
 sh-4.2$ cd broker/bin
+
 sh-4.2$ ./artemis queue stat
+
 OpenJDK 64-Bit Server VM warning: If the number of processors is expected to increase from one, then you should configure the number of parallel GC threads appropriately using -XX:ParallelGCThreads=N
+
 |NAME                     |ADDRESS                  |CONSUMER_COUNT |MESSAGE_COUNT |MESSAGES_ADDED |DELIVERING_COUNT |MESSAGES_ACKED |
+
 |DLQ                      |DLQ                      |0              |0             |0              |0                |0              |
+
 |ExpiryQueue              |ExpiryQueue              |0              |0             |0              |0                |0              |
+
 |activemq.management.6e278d1d-3f1f-4f8f-86d1-ffb8b72214c8|activemq.management.6e278d1d-3f1f-4f8f-86d1-ffb8b72214c8|1              |0             |0              |0                |0              |
+
 |demoQueue                |demoQueue                |0              |0             |0              |0                |0              |
+
 |incomingOrders           |incomingOrders           |1              |0             |168            |0                |168            |
+
 sh-4.2$ 
+
 
