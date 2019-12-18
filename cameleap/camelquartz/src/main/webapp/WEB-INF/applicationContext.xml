@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:camel="http://camel.apache.org/schema/spring"
+    xmlns:prime="http://ice.dhs.gov/PRIME/prime/1.0"
+    xmlns:seacats="http://ice.dhs.gov/PRIME/seacats/1.0"
+    xmlns:search="http://ice.dhs.gov/PRIME/search/1.0"
+    xmlns:synch="http://ice.dhs.gov/PRIME/synch/1.0"
+    xmlns:xql="http://ice.dhs.gov/PRIME/XQueryLite/1.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+    <import resource="TIERoute.xml"/>
+    <camelContext id="camelContext-d28caec2-0300-4f6f-bafd-7afff3df9405"
+        trace="false" xmlns="http://camel.apache.org/schema/spring">
+        <!-- <routeContextRef ref="TIERteCtx"/> -->
+        <route id="TIERoute">
+            <from id="TIEPoller" uri="quartz2://TIE-Poller?cron=15+*+*+*+*+?"/>
+            <log id="_log1" logName="prm.rte.TIERte" loggingLevel="INFO" message="TIE Route Invoked"/>
+            <setExchangePattern id="_setExchangePattern1" pattern="InOnly"/>
+        </route>
+        <!-- ********************************************************************************************** -->
+    </camelContext>
+</beans>
