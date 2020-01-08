@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:camel="http://camel.apache.org/schema/spring"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+    <!-- Define a traditional camel context here -->
+    <bean id="printEvents" class="org.example.fis.KafkaProcessor"/>
+    <camelContext id="camel-kafka-poc" xmlns="http://camel.apache.org/schema/spring">
+        <route id="producer-route">
+            <from id="route-timer" uri="timer:foo?period=20000"/>
+            <setBody id="_setBody1">
+                <simple>Message creation: ${date:now:yyyy-MM-dd HH:mm:ss}</simple>
+            </setBody>
+            <to id="_to1" uri="kafka:{{kafka.topic}}"/>
+            <log id="_producer_route_logs" message="headers ${in.headers}; body: ${body}"/>
+            <bean ref="printEvents"/>
+        </route>
+        
+          <route id="consumer-route">
+            <from id="kafka-consumer" uri="kafka:{{kafka.topic}}"/>
+            <log id="_consumer_route_logs" message="headers ${in.headers}; body: ${body}"/>
+        </route>
+    </camelContext>
+</beans>
