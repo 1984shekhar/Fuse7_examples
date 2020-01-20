@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://camel.apache.org/schema/spring       http://camel.apache.org/schema/spring/camel-spring.xsd">
+    <bean
+        class="org.apache.camel.component.elasticsearch.ElasticsearchComponent" id="elasticsearch-rest">
+        <property name="hostAddresses" value="localhost:9200"/>
+        <!-- <property key="" value=""/> -->
+    </bean>
+    <bean class="org.mycompany.RequestProcessor" id="elasticsearchRequest"/>
+    <bean class="org.mycompany.ResponseProcessor" id="elasticsearchResponse"/>
+    <camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
+        <route id="simple-route">
+            <from id="route-timer" uri="timer://foo?period=15000"/>
+            <process id="_process1" ref="elasticsearchRequest"/>
+            <!--   <log id="route-log" message=">>> ${body}"/> -->
+            <to id="_to1" uri="direct:search"/>
+        </route>
+        <route id="elasticSearch_route">
+            <from id="_from1" uri="direct:search"/>
+            <!-- <to id="_to2" uri="elasticsearch-rest://elasticsearch?operation=Search&amp;useScroll=true"/>-->
+            <to id="_to2" uri="elasticsearch-rest://elasticsearch?operation=Search"/>
+            <log id="_log1" message="response: ${body}"/>
+            <process id="_process2" ref="elasticsearchResponse"/>
+        </route>
+    </camelContext>
+</beans>
