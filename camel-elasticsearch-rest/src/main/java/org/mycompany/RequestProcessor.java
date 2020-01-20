@@ -14,6 +14,8 @@ public class RequestProcessor implements Processor {
 		SearchRequest searchRequest = new SearchRequest(); 
 		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder(); 
 		searchSourceBuilder.query(QueryBuilders.matchAllQuery()); 
+		searchSourceBuilder.from(0); 
+		searchSourceBuilder.size(15); 
 		searchRequest.source(searchSourceBuilder);
 		exchange.getIn().setBody(searchRequest);
 	}
