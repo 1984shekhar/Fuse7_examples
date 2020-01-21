@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2014-2017, Red Hat, Inc. and/or its affiliates, and individual 
+	contributors by the @authors tag. Licensed under the Apache License, Version 
+	2.0 (the "License"); you may not use this file except in compliance with 
+	the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!-- This is the OSGi Blueprint XML file defining the Camel context and routes. 
+	Because the file is in the OSGI-INF/blueprint directory inside our JAR, it 
+	will be automatically activated as soon as the bundle is installed. The root 
+	element for any OSGi Blueprint file is 'blueprint' - you also see the namespace 
+	definitions for both the Blueprint and the Camel namespaces. -->
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 https://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd                            http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
+	<!-- The namespace for the camelContext element in Blueprint is 'https://camel.apache.org/schema/blueprint'. 
+		Additionally, we can also define namespace prefixes we want to use them in 
+		the XPath expressions in our CBR. While it is not required to assign id's 
+		to the <camelContext/> and <route/> elements, it is a good idea to set those 
+		for runtime management purposes (logging, JMX MBeans, ...) -->
+
+
+	<camelContext id="_context1"
+		xmlns="http://camel.apache.org/schema/blueprint">
+		
+	<onException id="_onException1">
+		<exception>
+		org.apache.camel.processor.ThrottlerRejectedExecutionException
+		</exception>
+		<handled>
+			<constant>true</constant>
+		</handled>
+		<log message="${exception.message}" />
+	</onException>
+	
+		<route id="simple-route">
+			<from id="route-timer" uri="timer://foo?period=2000&amp;repeatCount=5" />
+			<setHeader headerName="_header" id="_setHeader1">
+				<simple>Message creation: ${date:now:yyyy-MM-dd HH:mm:ss}</simple>
+			</setHeader>
+			<log id="_log1" message="in >>> ${in.headers}" />
+			<throttle id="_throttle1" timePeriodMillis="10500"
+				rejectExecution="true" asyncDelayed="true">
+				<constant>2</constant>
+				<delay asyncDelayed="true"><constant>10500</constant></delay>
+				<log id="_log2" message="between >>> ${in.headers}" />
+			</throttle>
+			<log id="_log3" message="out >>> ${headers}" />
+		</route>
+
+	</camelContext>
+</blueprint>
