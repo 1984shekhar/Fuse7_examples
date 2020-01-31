@@ -1,11 +1,15 @@
 # Standalone Run
 
 mvn clean package
+
 java -jar target/camel-ose-springboot-xml-1.0.0-SNAPSHOT.jar
 
-WSDL url:http://localhost:8080/services/addService?wsdl
+WSDL url:
+
+http://localhost:8080/services/addService?wsdl
 
 Soap Request:
+
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="https://my.test.com/services/AdditionService">
    <soapenv:Header/>
    <soapenv:Body>
@@ -19,6 +23,7 @@ Soap Request:
 </soapenv:Envelope>
 
 Soap Response:
+
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
    <soap:Body>
       <ns2:additionResponse xmlns:ns2="https://my.test.com/services/AdditionService">
