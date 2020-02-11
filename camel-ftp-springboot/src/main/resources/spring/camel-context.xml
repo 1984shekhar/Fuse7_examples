@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://camel.apache.org/schema/spring       http://camel.apache.org/schema/spring/camel-spring.xsd">
+    <camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
+        <route id="simple-route">
+            <from id="route-ftp" uri="ftp://cpandey@10.67.116.37/ftpfolder?password=!Tushar1991&amp;passiveMode=true"/>
+<!--             <setBody id="route-setBody">
+                <simple>Hello World from camel-context.xml</simple>
+            </setBody> -->
+            <log id="route-log" message="Headers>>>${headers}........Body>>> ${body}"/>
+        </route>
+    </camelContext>
+</beans>
