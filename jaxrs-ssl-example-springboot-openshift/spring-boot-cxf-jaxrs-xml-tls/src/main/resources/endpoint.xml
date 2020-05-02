@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:http="http://cxf.apache.org/transports/http/configuration"
+       xmlns:httpu="http://cxf.apache.org/transports/http-undertow/configuration"
+       xmlns:sec="http://cxf.apache.org/configuration/security"
+       xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+       xmlns:cxf="http://cxf.apache.org/core"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans                 http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://cxf.apache.org/transports/http/configuration         http://cxf.apache.org/schemas/configuration/http-conf.xsd
+        http://cxf.apache.org/transports/http-undertow/configuration   http://cxf.apache.org/schemas/configuration/http-undertow.xsd
+        http://cxf.apache.org/configuration/security                http://cxf.apache.org/schemas/configuration/security.xsd
+        http://cxf.apache.org/core 									http://cxf.apache.org/schemas/core.xsd 
+		http://cxf.apache.org/jaxrs 								http://cxf.apache.org/schemas/jaxrs.xsd">
+
+    <jaxrs:server  address="https://0.0.0.0:8443/">
+        <jaxrs:serviceBeans>
+            <ref bean="resource"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:features>
+            <bean class="org.apache.cxf.jaxrs.swagger.Swagger2Feature"/>
+        </jaxrs:features>
+    </jaxrs:server>
+    
+     <httpu:engine-factory id="tls-config">
+        <httpu:engine port="8443">
+            <httpu:tlsServerParameters>
+                <sec:keyManagers keyPassword="password">
+                <sec:keyStore type="JKS" password="password"
+			file="/home/chandrashekhar/Development/GIT_REPO/Fuse7_examples/jaxrs-ssl-example-springboot-openshift/spring-boot-cxf-jaxrs-xml-tls/keystore.jks"/>
+            </sec:keyManagers>
+            </httpu:tlsServerParameters>
+        </httpu:engine>
+    </httpu:engine-factory>
+    
+    <bean id="resource" class="io.fabric8.quickstarts.cxf.jaxrs.HelloServiceImpl"/> 
+</beans>
