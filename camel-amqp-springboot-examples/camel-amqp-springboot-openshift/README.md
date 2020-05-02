@@ -64,6 +64,7 @@ running pods, and view logs and much more.
 
 
 # Create configmap
+```
 [cpandey@cpandey camel-amqp-springboot-openshift]$ oc get service -n amq-demo
 NAME                 TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)     AGE
 broker-amq-amqp      ClusterIP   172.30.139.253   <none>        5672/TCP    2h
@@ -78,10 +79,11 @@ service.host=172.30.139.253
 amqp.servicePort=5672
 
 oc create configmap spring-boot-camel-amq-config --from-env-file=./application.properties
-
+```
 
 
 # Check Statistics
+```
 oc project amq-demo
 [cpandey@cpandey spring-boot-camel-config-archetype]$ oc get pods
 
@@ -117,4 +119,4 @@ OpenJDK 64-Bit Server VM warning: If the number of processors is expected to inc
 
 sh-4.2$ 
 
-
+```
