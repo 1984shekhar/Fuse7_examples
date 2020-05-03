@@ -1,1 +1,152 @@
 
+kind: DeploymentConfig
+apiVersion: apps.openshift.io/v1
+metadata:
+  name: s2i-fuse74-spring-boot-cxf-jaxrs
+  namespace: restproject
+  selfLink: >-
+    /apis/apps.openshift.io/v1/namespaces/restproject/deploymentconfigs/s2i-fuse74-spring-boot-cxf-jaxrs
+  uid: bebd5366-9306-47c7-9f41-403e8bd9885f
+  resourceVersion: '19203900'
+  generation: 8
+  creationTimestamp: '2020-05-03T09:26:59Z'
+  labels:
+    app: s2i-fuse74-spring-boot-cxf-jaxrs
+    component: s2i-fuse74-spring-boot-cxf-jaxrs
+    group: quickstarts
+    provider: s2i
+    template: s2i-fuse74-spring-boot-cxf-jaxrs
+    template.openshift.io/template-instance-owner: 22cc8d21-de78-4012-8112-6df536a653ec
+    version: '1.1'
+spec:
+  strategy:
+    type: Rolling
+    rollingParams:
+      updatePeriodSeconds: 1
+      intervalSeconds: 1
+      timeoutSeconds: 600
+      maxUnavailable: 25%
+      maxSurge: 25%
+    resources: {}
+    activeDeadlineSeconds: 21600
+  triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+          - s2i-fuse74-spring-boot-cxf-jaxrs
+        from:
+          kind: ImageStreamTag
+          namespace: restproject
+          name: 's2i-fuse74-spring-boot-cxf-jaxrs:latest'
+        lastTriggeredImage: >-
+          image-registry.openshift-image-registry.svc:5000/restproject/s2i-fuse74-spring-boot-cxf-jaxrs@sha256:ef263742c173984d0329d3c38ffde978696186899bf35fd6596c6f9c03ddeb31
+  replicas: 1
+  revisionHistoryLimit: 10
+  test: false
+  selector:
+    app: s2i-fuse74-spring-boot-cxf-jaxrs
+    component: s2i-fuse74-spring-boot-cxf-jaxrs
+    deploymentconfig: s2i-fuse74-spring-boot-cxf-jaxrs
+    group: quickstarts
+    provider: s2i
+    version: '1.1'
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: s2i-fuse74-spring-boot-cxf-jaxrs
+        component: s2i-fuse74-spring-boot-cxf-jaxrs
+        deploymentconfig: s2i-fuse74-spring-boot-cxf-jaxrs
+        group: quickstarts
+        provider: s2i
+        version: '1.1'
+    spec:
+      volumes:
+        - name: rest-keystore
+          secret:
+            secretName: rest-keystore
+            items:
+              - key: keystore.jks
+                path: keystore.jks
+            defaultMode: 420
+      containers:
+        - resources:
+            limits:
+              cpu: '1'
+              memory: 256Mi
+            requests:
+              cpu: 200m
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+              scheme: HTTPS
+            initialDelaySeconds: 10
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          terminationMessagePath: /dev/termination-log
+          name: s2i-fuse74-spring-boot-cxf-jaxrs
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+              scheme: HTTPS
+            initialDelaySeconds: 180
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          env:
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+          ports:
+            - name: jolokia
+              containerPort: 8778
+              protocol: TCP
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: rest-keystore
+              readOnly: true
+              mountPath: /mnt/secrets
+          terminationMessagePolicy: File
+          image: >-
+            image-registry.openshift-image-registry.svc:5000/restproject/s2i-fuse74-spring-boot-cxf-jaxrs@sha256:ef263742c173984d0329d3c38ffde978696186899bf35fd6596c6f9c03ddeb31
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+status:
+  observedGeneration: 8
+  details:
+    message: config change
+    causes:
+      - type: ConfigChange
+  availableReplicas: 1
+  unavailableReplicas: 0
+  latestVersion: 7
+  updatedReplicas: 1
+  conditions:
+    - type: Available
+      status: 'True'
+      lastUpdateTime: '2020-05-03T09:56:57Z'
+      lastTransitionTime: '2020-05-03T09:56:57Z'
+      message: Deployment config has minimum availability.
+    - type: Progressing
+      status: 'True'
+      lastUpdateTime: '2020-05-03T09:58:05Z'
+      lastTransitionTime: '2020-05-03T09:58:03Z'
+      reason: NewReplicationControllerAvailable
+      message: >-
+        replication controller "s2i-fuse74-spring-boot-cxf-jaxrs-7" successfully
+        rolled out
+  replicas: 1
+  readyReplicas: 1
