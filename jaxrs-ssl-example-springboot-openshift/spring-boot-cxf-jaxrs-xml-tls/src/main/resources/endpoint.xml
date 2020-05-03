@@ -31,16 +31,24 @@
         http://cxf.apache.org/configuration/security                http://cxf.apache.org/schemas/configuration/security.xsd
         http://cxf.apache.org/core 									http://cxf.apache.org/schemas/core.xsd 
 		http://cxf.apache.org/jaxrs 								http://cxf.apache.org/schemas/jaxrs.xsd">
-
-    <jaxrs:server  address="https://${serverip}:${serverport}">
+<bean id="logInbound" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+    <bean id="logOutbound" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+		    <!--<jaxrs:server  address="https://${serverip}:${serverport}">-->
+<jaxrs:server  address="/">			    
         <jaxrs:serviceBeans>
             <ref bean="resource"/>
         </jaxrs:serviceBeans>
         <jaxrs:features>
             <bean class="org.apache.cxf.jaxrs.swagger.Swagger2Feature"/>
-        </jaxrs:features>
+    </jaxrs:features>
+<jaxrs:inInterceptors>
+            <ref bean="logInbound"/>
+        </jaxrs:inInterceptors>
+        <jaxrs:outInterceptors>
+            <ref bean="logOutbound"/>
+        </jaxrs:outInterceptors>
     </jaxrs:server>
-    
+    <!--    
      <httpu:engine-factory id="tls-config">
         <httpu:engine port="${serverport}">
             <httpu:tlsServerParameters>
@@ -51,6 +59,6 @@
             </httpu:tlsServerParameters>
         </httpu:engine>
     </httpu:engine-factory>
-    
+    -->
     <bean id="resource" class="io.fabric8.quickstarts.cxf.jaxrs.HelloServiceImpl"/> 
 </beans>
