@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:camel="http://camel.apache.org/schema/spring"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+  <!-- Define a traditional camel context here -->
+<camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
+	<endpoint id="httpsEndpoint" uri="https4://${serverip}:${serverport}/${servicepath}?sslContextParameters=#testSSLContext&amp;throwExceptionOnFailure=true&amp;httpMethod=get"/>
+    <route id="simple-route">
+      <from id="route-timer" uri="timer:foo?period=30000"/>
+      <transform id="route-transform">
+        <method ref="myTransformer"/>
+      </transform>
+      <log id="route-log" message=">>> ${body}"/>
+			      <toD uri="ref:httpsEndpoint"/>
+    </route>
+  </camelContext>
+	    <bean class="org.apache.camel.util.jsse.SSLContextParameters" id="testSSLContext">
+        <property name="trustManagers" ref="routeTrustManagers"/>
+    </bean>
+    <bean class="org.apache.camel.util.jsse.TrustManagersParameters" id="routeTrustManagers">
+        <property name="keyStore" ref="routeTruststore"/>
+    </bean>
+    <keyStoreParameters id="routeTruststore" password="${truststorepassword}" resource="${truststorepath}" type="JKS" xmlns="http://camel.apache.org/schema/spring"/>
+
+
+</beans>
