@@ -1,0 +1,149 @@
+
+kind: DeploymentConfig
+apiVersion: apps.openshift.io/v1
+metadata:
+  name: camel-client
+  namespace: restproject
+  selfLink: >-
+    /apis/apps.openshift.io/v1/namespaces/restproject/deploymentconfigs/camel-client
+  uid: 79c70898-7453-4b8d-a695-ca2a667665bd
+  resourceVersion: '19219241'
+  generation: 4
+  creationTimestamp: '2020-05-03T10:21:15Z'
+  labels:
+    app: camel-client
+    component: camel-client
+    group: quickstarts
+    provider: s2i
+    template: s2i-fuse74-spring-boot-camel-xml
+    template.openshift.io/template-instance-owner: 1247abcd-83c2-429f-b3ba-3f6f7d71e65e
+    version: '1.2'
+spec:
+  strategy:
+    type: Rolling
+    rollingParams:
+      updatePeriodSeconds: 1
+      intervalSeconds: 1
+      timeoutSeconds: 600
+      maxUnavailable: 25%
+      maxSurge: 25%
+    resources: {}
+    activeDeadlineSeconds: 21600
+  triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+          - camel-client
+        from:
+          kind: ImageStreamTag
+          namespace: restproject
+          name: 'camel-client:latest'
+        lastTriggeredImage: >-
+          image-registry.openshift-image-registry.svc:5000/restproject/camel-client@sha256:312c7072df1086dde435b8941cee754d9f1a225e5d590cbabb3da5c3f7fb735c
+  replicas: 1
+  revisionHistoryLimit: 10
+  test: false
+  selector:
+    app: camel-client
+    component: camel-client
+    deploymentconfig: camel-client
+    group: quickstarts
+    provider: s2i
+    version: '1.2'
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: camel-client
+        component: camel-client
+        deploymentconfig: camel-client
+        group: quickstarts
+        provider: s2i
+        version: '1.2'
+    spec:
+      volumes:
+        - name: rest-keystore
+          secret:
+            secretName: rest-keystore
+            items:
+              - key: keystore.jks
+                path: clientkeystore.jks
+            defaultMode: 420
+      containers:
+        - resources:
+            limits:
+              cpu: '1'
+              memory: 256Mi
+            requests:
+              cpu: 200m
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          terminationMessagePath: /dev/termination-log
+          name: camel-client
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+              scheme: HTTP
+            initialDelaySeconds: 180
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          env:
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+          ports:
+            - name: jolokia
+              containerPort: 8778
+              protocol: TCP
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: rest-keystore
+              readOnly: true
+              mountPath: /mnt/secrets
+          terminationMessagePolicy: File
+          image: >-
+            image-registry.openshift-image-registry.svc:5000/restproject/camel-client@sha256:312c7072df1086dde435b8941cee754d9f1a225e5d590cbabb3da5c3f7fb735c
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+status:
+  latestVersion: 3
+  observedGeneration: 4
+  replicas: 0
+  updatedReplicas: 0
+  availableReplicas: 0
+  unavailableReplicas: 0
+  details:
+    message: config change
+    causes:
+      - type: ConfigChange
+  conditions:
+    - type: Available
+      status: 'False'
+      lastUpdateTime: '2020-05-03T10:21:15Z'
+      lastTransitionTime: '2020-05-03T10:21:15Z'
+      message: Deployment config does not have minimum availability.
+    - type: Progressing
+      status: 'False'
+      lastUpdateTime: '2020-05-03T11:04:31Z'
+      lastTransitionTime: '2020-05-03T11:04:31Z'
+      reason: ProgressDeadlineExceeded
+      message: replication controller "camel-client-3" has failed progressing
