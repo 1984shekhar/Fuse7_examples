@@ -1,28 +1,35 @@
 setup ftp server:
 
 # Install ftp server
+```
 sudo yum install vsftpd
+```
 # Check status
+```
 sudo systemctl status vsftpd.service
+```
 # Start if ftp server inactive
+```
 sudo systemctl start vsftpd.service
-
+```
 # create ftpfolder in user's home location.
-
+```
 mkdir /home/cpandey/ftpfolder
-
+```
 # create csp.txt file
+```
 [cpandey@cpandey ftpfolder]$ cat csp.txt 
 I am camel-ftp poc
 hello it's just a poc
 [cpandey@cpandey ftpfolder]$ 
-
+```
 # Deploy in OpenShift environment:
+```
 mvn fabric8:deploy
+```
 
-
-Logs:
-
+# Logs
+```
 09:33:24.718 [main] INFO  o.a.tomcat.util.net.NioSelectorPool - Using a shared selector for servlet write/read
 09:33:24.769 [main] INFO  o.s.b.c.e.t.TomcatEmbeddedServletContainer - Tomcat started on port(s): 8080 (http)
 09:33:24.775 [main] INFO  org.mycompany.Application - Started Application in 27.256 seconds (JVM running for 31.833)
@@ -66,3 +73,4 @@ Logs:
 }........Body>>> I am camel-ftp poc
 hello it's just a poc
 
+```
