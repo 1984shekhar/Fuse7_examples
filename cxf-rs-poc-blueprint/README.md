@@ -1,8 +1,10 @@
 This POC can be tested as:
-
-in FUSE_HOME/etc/system.properties:
+- In FUSE_HOME/etc/system.properties:
+```
 adi.ws.port=8080
-
+```
+- install application as
+```
 karaf@root()> bundle:install -s mvn:poc/cxf-rest/1.0
 Bundle ID: 245
 
@@ -12,8 +14,9 @@ Name            │ State   │ Address                                         
 ────────────────┼─────────┼──────────────────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 CustomerService │ Started │ http://0.0.0.0:8080/rest/Finance/StudentECAF/1.0 │ poc.cxf-rest-cxf407282075
 karaf@root()> 
-
-
+```
+- Test application using curl
+```
 [cpandey@cpandey log]$ curl -v http://0.0.0.0:8080/rest/Finance/StudentECAF/1.0/123
 * About to connect() to 0.0.0.0 port 8080 (#0)
 *   Trying 0.0.0.0...
@@ -36,3 +39,4 @@ karaf@root()>
 < 
 * Connection #0 to host 0.0.0.0 left intact
 [cpandey@cpandey log]$
+```
