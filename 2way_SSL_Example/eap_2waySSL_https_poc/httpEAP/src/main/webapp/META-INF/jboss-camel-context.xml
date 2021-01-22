@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:camel="http://camel.apache.org/schema/spring"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd             http://camel.apache.org/schema/spring       http://camel.apache.org/schema/spring/camel-spring.xsd">
+    <bean class="org.apache.http.conn.ssl.AllowAllHostnameVerifier" id="apacheHstNmVerifyDefeater"/>
+   <camel:sslContextParameters id="sslCtxParmsEV">
+        <camel:keyManagers keyPassword="secret">
+            <camel:keyStore password="secret" resource="/home/cpandey/Downloads/mycerts/client1.jks"/>
+        </camel:keyManagers>
+        <camel:trustManagers>
+            <camel:keyStore password="secret" resource="/home/cpandey/Downloads/mycerts/client1_trust.jks"/>
+        </camel:trustManagers>
+    </camel:sslContextParameters>
+    <camelContext id="camelContext-fe2f82c3-3ec1-4d5d-a0f4-c090e22de7eb"
+        trace="false" xmlns="http://camel.apache.org/schema/spring">
+        <route id="HttpTest">
+            <from id="_from1" uri="timer:tester?period=30000"/>
+            <setHeader headerName="CamelHttpMethod" id="_setHeader1">
+                <constant>GET</constant>
+            </setHeader>
+            <setHeader headerName="CamelHttpUri" id="_setHeader2">
+                <simple>https://localhost:8444/</simple>
+            </setHeader>
+            <!--to	uri="http4://dummyurl?throwExceptionOnFailure=false&amp;useGobalSslContextParameters=true&amp;x509HostnameVerifier=apacheHstNmVerifyDefeater"
+				id="httpProfile" /-->
+            <to id="httpProfile" uri="http4://dummyurl?throwExceptionOnFailure=false&amp;sslContextParameters=sslCtxParmsEV&amp;x509HostnameVerifier=apacheHstNmVerifyDefeater"/>
+             <!-- <to id="httpProfile" uri="http4://dummyurl?throwExceptionOnFailure=false&amp;x509HostnameVerifier=apacheHstNmVerifyDefeater&amp;useGobalSslContextParameters=true&amp;useSystemProperties=true"/> -->
+            <log id="_log1" logName="testoutput" loggingLevel="INFO" message="Response is: ${body}"/>
+        </route>
+    </camelContext>
+</beans>
