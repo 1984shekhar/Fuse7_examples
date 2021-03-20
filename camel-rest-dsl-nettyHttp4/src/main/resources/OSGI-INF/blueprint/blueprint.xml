@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+             http://www.osgi.org/xmlns/blueprint/v1.0.0 https://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+             http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
+
+	<bean class="com.mycompany.test.profile.LogTransaction"
+		id="logTransaction" />
+
+	<sslContextParameters id="MySslContextParameter"
+		xmlns="http://camel.apache.org/schema/blueprint">
+		<secureSocketProtocols>
+			<!-- Do NOT enable SSLv3 (POODLE vulnerability) -->
+			<secureSocketProtocol>TLSv1</secureSocketProtocol>
+			<secureSocketProtocol>TLSv1.1</secureSocketProtocol>
+			<secureSocketProtocol>TLSv1.2</secureSocketProtocol>
+		</secureSocketProtocols>
+		<keyManagers keyPassword="KeyPass">
+			<keyStore
+				resource="/home/chandrashekhar/Downloads/certs/serviceKeystore.jks"
+				password="StorePass" />
+		</keyManagers>
+		<trustManagers>
+			<keyStore
+				resource="/home/chandrashekhar/Downloads/certs/serviceKeystore.jks"
+				password="StorePass" />
+		</trustManagers>
+	</sslContextParameters>
+
+	<camelContext id="test_rest_dsl"
+		xmlns="http://camel.apache.org/schema/blueprint" trace="true">
+		 <restConfiguration bindingMode="off"
+			component="netty4-http" port="9091" scheme="https">
+			<endpointProperty key="sslContextParameters"
+				value="#MySslContextParameter" />
+			<endpointProperty key="sslClientCertHeaders"
+				value="true" />
+			<endpointProperty key="needClientAuth" value="true" />
+			<endpointProperty key="ssl" value="true" />
+		</restConfiguration>
+		<rest path="/service">
+			<get uri="/info">
+				<to uri="direct:hello" />
+			</get>
+		</rest>
+
+		<route id="_route2">
+			<from id="_from1" uri="direct:hello" />
+			<setBody>
+				<constant>HEY, ALL IS WELL</constant>
+			</setBody>
+			<log message="body ${body}" />
+		</route>
+		<route id="route3">
+			<from
+				uri="netty4-http:https://localhost:8000/service/info?ssl=true&amp;sslContextParameters=#MySslContextParameter&amp;needClientAuth=true&amp;sslClientCertHeaders=false" />
+			<log message="incoming request" />
+			<setBody>
+				<constant>WELCOME ALL</constant>
+			</setBody>
+		</route>
+		<route id="route4">
+			<from uri="timer://foo?fixedRate=true&amp;period=10000" />
+			<to
+				uri="netty4-http:https://localhost:9091/service/info?sync=true&amp;ssl=true&amp;sslContextParameters=#MySslContextParameter" />
+		</route>
+	</camelContext>
+</blueprint>
