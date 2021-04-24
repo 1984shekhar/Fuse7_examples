@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.mycompany</groupId>
+	<artifactId>karafArtemis</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>bundle</packaging>
+	<name>Fuse7 AMQ7 Quickstart</name>
+	<description>Fuse7 AMQ7 Quickstart</description>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<version.org.jboss.redhat-fuse>7.8.0.fuse-sb2-780038-redhat-00001</version.org.jboss.redhat-fuse>
+		<maven-bundle-plugin.version>3.5.1</maven-bundle-plugin.version>
+	</properties>
+
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- Fuse BOM to import all non-plugin dependencies -->
+
+            <dependency>
+                <groupId>org.jboss.redhat-fuse</groupId>
+                <artifactId>fuse-karaf-bom</artifactId>
+                <version>${version.org.jboss.redhat-fuse}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>    
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-jms</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-blueprint</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>artemis-jms-client</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>geronimo-jms_2.0_spec</artifactId>
+					<groupId>org.apache.geronimo.specs</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.messaginghub</groupId>
+			<artifactId>pooled-jms</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-test-blueprint</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>org.apache.felix.fileinstall</artifactId>
+					<groupId>org.apache.felix</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+	<repositories>
+		<repository>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>release.fusesource.org</id>
+			<name>FuseSource Release Repository</name>
+			<url>http://repo.fusesource.com/nexus/content/repositories/releases</url>
+		</repository>
+		<repository>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>ea.fusesource.org</id>
+			<name>FuseSource Community Early Access Release Repository</name>
+			<url>http://repo.fusesource.com/nexus/content/groups/ea</url>
+		</repository>
+		<repository>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>red-hat-ga-repository</id>
+			<name>Red Hat GA Repository</name>
+			<url>https://maven.repository.redhat.com/ga</url>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>release.fusesource.org</id>
+			<name>FuseSource Release Repository</name>
+			<url>http://repo.fusesource.com/nexus/content/repositories/releases</url>
+		</pluginRepository>
+		<pluginRepository>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>ea.fusesource.org</id>
+			<name>FuseSource Community Early Access Release Repository</name>
+			<url>http://repo.fusesource.com/nexus/content/groups/ea</url>
+		</pluginRepository>
+		<pluginRepository>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>red-hat-ga-repository</id>
+			<name>Red Hat GA Repository</name>
+			<url>https://maven.repository.redhat.com/ga</url>
+		</pluginRepository>
+	</pluginRepositories>
+	<build>
+		<defaultGoal>install</defaultGoal>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>${maven-bundle-plugin.version}</version>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Bundle-SymbolicName>karafArtemis</Bundle-SymbolicName>
+						<Bundle-Name>karafArtemis</Bundle-Name>
+						<Import-Package>
+							org.messaginghub.pooled.jms;version="[1,2)",
+							org.apache.activemq.artemis;version="[2.6.3,3)",
+							*
+						</Import-Package>
+					</instructions>
+				</configuration>
+			</plugin>			
+		</plugins>
+	</build>
+</project>
