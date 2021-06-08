@@ -1,0 +1,1 @@
+install -s mvn:com.mycompany/blueprint-osgi-service-exporter/1.0

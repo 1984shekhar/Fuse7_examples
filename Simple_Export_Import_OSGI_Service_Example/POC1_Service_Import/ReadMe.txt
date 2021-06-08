@@ -1,0 +1,1 @@
+install -s mvn:com.mycompany/poc-service-import/1.0
