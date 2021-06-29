@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="              http://www.osgi.org/xmlns/blueprint/v1.0.0 https://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd              http://camel.apache.org/schema/blueprint https://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
+	<bean class="com.mypackage.OrderService" id="orderService" />
+	    <bean class="com.mypackage.TestProcessor" id="testProcessor" />
+	    
+	     <bean id="redeliveryPolicy" class="org.apache.camel.processor.RedeliveryPolicy">
+                <property name="maximumRedeliveries" value="1" />
+                <property name="redeliveryDelay" value="5000" />
+        </bean>
+
+	
+	<camelContext id="cbr-example-context"
+		xmlns="http://camel.apache.org/schema/blueprint">
+
+
+		<onException redeliveryPolicyRef="redeliveryPolicy" useOriginalMessage="true">
+			<exception>java.lang.Exception</exception>
+			<handled>
+				<constant>true</constant>
+			</handled>
+			<log message="within onException clause"/>
+			<to uri="seda:withinExceptionBlock"/>
+		</onException>
+
+		<route id="route1">
+			<from id="_from1" uri="timer://foo?repeatCount=1" />
+			<setBody id="_setBody1">
+				<constant>helloALl</constant>
+			</setBody>
+			<log id="_log1" message="body1....${body}" />
+			<to id="_to1" uri="seda:queue.inbox" />
+		</route>
+
+
+		<route id="route2">
+			<from id="_from2" uri="seda:queue.inbox" />
+			<setBody id="_setBody2">
+				<constant>helloALlmodified</constant>
+			</setBody>
+			<bean id="_bean1" method="validate" ref="orderService" />
+			<log id="_log2" message="body2....{body}" />
+		</route>
+
+
+		<route id="route3">
+			<from id="_from3" uri="seda:withinExceptionBlock" />
+			<log id="_log3" message="in withinExceptionBlock ${body}" />
+		</route>
+
+	</camelContext>
+</blueprint>
+
