@@ -23,26 +23,46 @@
    The root element for any OSGi Blueprint file is 'blueprint' - you also see the namespace definitions for both the Blueprint
    and the CXF JAX-RS namespaces.
 -->
-      
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:camel="http://camel.apache.org/schema/blueprint"
-       xmlns:cxf="http://camel.apache.org/schema/blueprint/cxf"
-       xsi:schemaLocation="
-       http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
-       http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
-      
+    xmlns:camel="http://camel.apache.org/schema/blueprint"
+    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
+    xmlns:cxf="http://camel.apache.org/schema/blueprint/cxf"
+    xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
+    xmlns:http-conf="http://cxf.apache.org/transports/http/configuration"
+    xmlns:prop="http://camel.apache.org/schema/placeholder"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="                        http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd                        http://camel.apache.org/schema/blueprint/cxf http://camel.apache.org/schema/blueprint/cxf/camel-cxf.xsd                          http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd         http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd  http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
 
-      <cxf:rsServer id="studentECAFREST" address="http://0.0.0.0:{{adi.ws.port}}/rest/Finance/StudentECAF/1.0" serviceClass="org.jboss.fuse.quickstarts.cxf.rest.CustomerService">
-    </cxf:rsServer>
-
+    <cxf:rsServer
+        address="http://0.0.0.0:9090/rest/Finance/StudentECAF/1.0"
+        id="studentECAFREST" serviceClass="org.jboss.fuse.quickstarts.cxf.rest.CustomerService"/>
+        
+        
     <!-- context -->
-    <camelContext xmlns="http://camel.apache.org/schema/blueprint">
-       <route id="csp123">
-       <from id="_from1" uri="cxfrs:bean:studentECAFREST?bindingStyle=SimpleConsumer"/>
-       <log id="_log2" message="body : ${body}"/>
-       </route>
+    <camelContext id="camelContext-22bbba11-7d28-4c1d-bf93-7a40a4a85a23" xmlns="http://camel.apache.org/schema/blueprint">
+        <route id="csp123">
+            <from id="_from1" uri="cxfrs:bean:studentECAFREST?bindingStyle=SimpleConsumer"/>
+            <!-- <delay><constant>8000</constant></delay> -->
+            <log id="_log2" message="headers: ${headers}------- body : ${body}"/>
+        </route>
+        
+        <route id="client">
+            <from id="_from1" uri="timer://foo?fixedRate=true&amp;period=15000"/>
+            <setHeader headerName="CamelHttpPath"><constant>/123</constant></setHeader>
+            <setBody><constant>{ "name": "Jack" }</constant></setBody>
+            <to id="_to1" uri="cxfrs:bean:rsUpdateRFU"/>
+        </route>
+        
+        
     </camelContext>
- 
+    
+    <http-conf:conduit name="http://0.0.0.0:9090/.*">
+        <http-conf:client ConnectionTimeout="3000" ReceiveTimeout="5000"/>
+    </http-conf:conduit>
+    
+    
+    <cxf:rsClient address="http://0.0.0.0:9090/rest/Finance/StudentECAF/1.0"
+        id="rsUpdateRFU" loggingFeatureEnabled="true" serviceClass="org.jboss.fuse.quickstarts.cxf.rest.CustomerService">
+    </cxf:rsClient>
+
 </blueprint>
