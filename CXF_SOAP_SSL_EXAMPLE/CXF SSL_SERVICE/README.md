@@ -1,3 +1,6 @@
+ keytool -genkey -dname "CN=localhost, OU=Engineering, O=Progress, ST=Co. Dublin, C=IE" -validity 365 -alias CertAlias -keypass CertPassword -keystore CertName.jks -storepass CertPassword
+
+ 
  <groupId>com.mycompany</groupId>
   <artifactId>camel-cxf-ssl</artifactId>
   <version>1.0</version>
