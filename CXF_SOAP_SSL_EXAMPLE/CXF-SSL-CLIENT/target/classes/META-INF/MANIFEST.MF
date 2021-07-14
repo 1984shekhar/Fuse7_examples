@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bnd-LastModified: 1626259461623
+Build-Jdk: 15.0.1
+Built-By: cpandey
+Bundle-Blueprint: OSGI-INF/blueprint/blueprint.xml
+Bundle-Description: camel-cxf-ssl-client
+Bundle-License: https://www.apache.org/licenses/LICENSE-2.0.html
+Bundle-ManifestVersion: 2
+Bundle-Name: CXF-SSL-CLIENT
+Bundle-SymbolicName: CXF-SSL-CLIENT
+Bundle-Version: 1.0.0
+Created-By: Apache Maven Bundle Plugin
+Export-Package: com.test.client;uses:="org.apache.camel";version="1.0.0"
+Import-Package: com.mycompany.cxf.soap.model;version="[1.0,2)",org.apach
+ e.camel;version="[2.21,3)",org.apache.log4j;version="[1.2,2)",org.osgi.
+ service.blueprint;version="[1.0.0,2.0.0)"
+Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"
+Tool: Bnd-3.2.0.201605172007
