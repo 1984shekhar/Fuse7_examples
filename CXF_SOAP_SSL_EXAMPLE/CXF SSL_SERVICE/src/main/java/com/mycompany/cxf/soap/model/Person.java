@@ -49,4 +49,9 @@ public class Person {
 
         return true;
     }
+    
+    @Override
+    public String toString() {
+    	return "Name: "+ this.getName() + " id: "+ this.getId() + " Age: " +this.getAge();
+    }
 }
