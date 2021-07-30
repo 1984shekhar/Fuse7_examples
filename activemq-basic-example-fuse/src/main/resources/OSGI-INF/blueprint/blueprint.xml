@@ -1,39 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="
-       http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
-       http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
-
-<bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
-		<property name="brokerURL" value="tcp://localhost:61618" />
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="        http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd        http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
+	<bean
+		class="org.apache.activemq.camel.component.ActiveMQComponent"
+		id="activemq">
+<!-- 		<property name="brokerURL" value="tcp://localhost:61616" />
 		<property name="userName" value="admin" />
-		<property name="password" value="admin" />
+		<property name="password" value="admin" /> -->
+		<property name="configuration" ref="jmsConfig"/>
+	</bean>
+	
+	<bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+                <property name="brokerURL" value="tcp://localhost:61616" />
+                <property name="userName" value="admin" />
+                <property name="password" value="admin" />
+                <!-- <property name="useCompression" value="$s{amq.broker.enable.compression}"/> -->
+                
+               <property name="redeliveryPolicy">   
+                        <bean class="org.apache.activemq.RedeliveryPolicy">
+                        <!-- <property name="backOffMultiplier" value="1.5" />
+                        <property name="initialRedeliveryDelay" value="2000" />
+                                <property name="maximumRedeliveryDelay" value="25000" />
+                        <property name="redeliveryDelay" value="500" />
+                        <property name="useExponentialBackOff" value="true" />
+                        <property name="useCollisionAvoidance" value="true" />
+                         -->
+                        <property name="maximumRedeliveries" value="2"/>
+                     </bean>
+                </property>             
+        </bean>
+
+	<bean id="pooledConnectionFactory"
+		class="org.apache.activemq.pool.PooledConnectionFactory">
+		<property name="maxConnections" value="5" />
+		<!-- <property name="maximumActive" value="500" /> -->
+		 <property name="connectionFactory" ref="jmsConnectionFactory" /> 
 	</bean>
 
-  <!-- Here is a sample which processes the input files
-         (leaving them in place - see the 'noop' flag), and
-         sends them on a JMS queue. This queue is watched by
-         another route which then performs content based
-         routing on the messages using XPath. 
-  -->
- <camelContext xmlns="http://camel.apache.org/schema/blueprint">
-    <route>
-      <from uri="file:/home/cpandey/data?noop=true"/>
-      <to uri="activemq:personnel.records"/>
-    </route>
-    <route>
-      <from uri="activemq:personnel.records"/>
-      <choice>
-        <when>
-          <xpath>/person/city = 'London'</xpath>
-          <to uri="file:/home/cpandey/output/uk"/>
-        </when>
-        <otherwise>
-          <to uri="file:/home/cpandey/output/others"/>
-        </otherwise>
-      </choice>
-    </route>
-  </camelContext>
 
+
+	<bean id="jmsConfig"
+		class="org.apache.camel.component.jms.JmsConfiguration">
+		<property name="connectionFactory"
+			ref="pooledConnectionFactory" />
+		<property name="transacted" value="true" />
+		<property name="concurrentConsumers" value="10" />
+	</bean> 
+
+<bean id="forceException" class="TestPackage.ForceException"/>
+	<camelContext
+		id="camelContext-56371d29-f73b-45ea-a277-7c9c8fa17476"
+		xmlns="http://camel.apache.org/schema/blueprint">
+		<route id="_route1">
+			<from id="_from1" uri="file:/home/cpandey/data" />
+			<to id="_to1" uri="activemq:personnel.records" />
+		</route>
+		<route id="_route2">
+			<from id="_from2" uri="activemq:personnel.records" />
+			<process ref="forceException"/>
+			<log message="body: ${body}"/>
+		</route>
+
+	</camelContext>
 </blueprint>
